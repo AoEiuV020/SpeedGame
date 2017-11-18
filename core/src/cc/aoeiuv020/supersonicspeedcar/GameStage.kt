@@ -2,10 +2,8 @@ package cc.aoeiuv020.supersonicspeedcar
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Image
 
 /**
  *
@@ -16,19 +14,13 @@ class GameStage : Stage() {
         private val TAG = GameStage::class.java.simpleName
     }
 
-    private val textures = listOf(Texture("badlogic.jpg"),
-            Texture("background.jpg"))
-
-    private val actor = Image(textures[0])
-
-    private val background = Background(textures[1])
+    private val car = Car()
+    private val background = Background(viewport)
 
     init {
 
-        background.init(viewport)
-
         addActor(background)
-        addActor(actor)
+        addActor(car)
 
     }
 
@@ -45,12 +37,13 @@ class GameStage : Stage() {
     }
 
     private fun move(x: Float, y: Float) {
-        actor.setPosition(x - actor.width / 2, y - actor.height / 2)
+        car.setPosition(x, y)
     }
 
     override fun dispose() {
         super.dispose()
-        textures.forEach(Texture::dispose)
+        background.dispose()
+        car.dispose()
     }
 
     inner class Listener : InputAdapter() {

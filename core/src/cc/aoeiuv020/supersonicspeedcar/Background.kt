@@ -5,30 +5,18 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.Viewport
 
 /**
  *
  * Created by AoEiuV020 on 2017.11.18-19:31:51.
  */
-class Background(private val texture: Texture) : Actor() {
-    private lateinit var images: List<Image>
+class Background(viewport: Viewport) : Actor(), Disposable {
+    private val texture = Texture("background.jpg")
+    private val images: List<Image>
 
-    override fun draw(batch: Batch?, parentAlpha: Float) {
-        images.forEach { image ->
-            image.draw(batch, parentAlpha)
-        }
-    }
-
-    fun update(camera: Camera) {
-        while (images[0].y + images[0].height < camera.position.y - camera.viewportHeight / 2) {
-            images.forEach { image ->
-                image.y += image.height
-            }
-        }
-    }
-
-    fun init(viewport: Viewport) {
+    init {
         val tmpImages = mutableListOf<Image>()
         val width = viewport.screenWidth.toFloat()
         val height = viewport.screenHeight.toFloat() / viewport.screenWidth * width
@@ -44,5 +32,23 @@ class Background(private val texture: Texture) : Actor() {
             tmpImages.add(image)
         }
         images = tmpImages
+    }
+
+    override fun draw(batch: Batch?, parentAlpha: Float) {
+        images.forEach { image ->
+            image.draw(batch, parentAlpha)
+        }
+    }
+
+    fun update(camera: Camera) {
+        while (images[0].y + images[0].height < camera.position.y - camera.viewportHeight / 2) {
+            images.forEach { image ->
+                image.y += image.height
+            }
+        }
+    }
+
+    override fun dispose() {
+        texture.dispose()
     }
 }
