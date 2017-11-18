@@ -2,7 +2,6 @@ package cc.aoeiuv020.supersonicspeedcar
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
-import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.Stage
 
 /**
@@ -16,28 +15,28 @@ class GameStage : Stage() {
 
     private val car = Car()
     private val background = Background(viewport)
+    private val listener = Listener()
 
     init {
+
+        car.setCenterPosition(width / 2, car.height / 2)
 
         addActor(background)
         addActor(car)
 
+        Gdx.input.inputProcessor = listener
     }
 
     override fun act(delta: Float) {
-        Gdx.input.inputProcessor = Listener()
+        (car.speed / 2).let {
+            camera.position.y += it
+            car.moveBy(0f, it)
+        }
 
-
-        camera.position.y += delta * 100
 
         background.update(camera)
 
-
         super.act(delta)
-    }
-
-    private fun move(x: Float, y: Float) {
-        car.setPosition(x, y)
     }
 
     override fun dispose() {
@@ -47,15 +46,9 @@ class GameStage : Stage() {
     }
 
     inner class Listener : InputAdapter() {
-        override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-            val v = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
-            move(v.x, v.y)
-            return super.touchDown(screenX, screenY, pointer, button)
-        }
 
         override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-            val v = camera.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
-            move(v.x, v.y)
+            car.moveBy(Gdx.input.getDeltaX(pointer).toFloat(), -Gdx.input.getDeltaY(pointer).toFloat())
             return super.touchDragged(screenX, screenY, pointer)
         }
     }
