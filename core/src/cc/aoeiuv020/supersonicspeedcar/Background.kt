@@ -21,13 +21,11 @@ class Background(private val texture: Texture) : Actor() {
     }
 
     fun update(camera: Camera) {
-/*
-        while (images[0].y < camera.position.y - camera.viewportHeight / 2) {
+        while (images[0].y + images[0].height < camera.position.y - camera.viewportHeight / 2) {
             images.forEach { image ->
                 image.y += image.height
             }
         }
-*/
     }
 
     fun init(viewport: Viewport) {
@@ -36,7 +34,7 @@ class Background(private val texture: Texture) : Actor() {
         val height = viewport.screenHeight.toFloat() / viewport.screenWidth * width
         val x = 0f
         var y = 0f
-        while (tmpImages.size * height < viewport.screenHeight + viewport.screenHeight) {
+        while (tmpImages.size * height < height + viewport.screenHeight) {
             val image = Image(texture)
             image.width = width
             image.height = height
