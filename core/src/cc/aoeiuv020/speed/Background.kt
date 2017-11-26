@@ -1,4 +1,4 @@
-package cc.aoeiuv020.supersonicspeedcar
+package cc.aoeiuv020.speed
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Texture

@@ -1,4 +1,4 @@
-package cc.aoeiuv020.supersonicspeedcar
+package cc.aoeiuv020.speed
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
