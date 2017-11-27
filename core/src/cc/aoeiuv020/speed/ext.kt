@@ -11,3 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 fun Actor.setCenter(x: Float, y: Float) {
     setPosition(x - width / 2, y - height / 2)
 }
+
+fun Float.between(from: Float, to: Float): Boolean
+        = from < this && this < to

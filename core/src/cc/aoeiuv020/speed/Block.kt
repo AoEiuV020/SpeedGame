@@ -3,6 +3,7 @@ package cc.aoeiuv020.speed
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.utils.Disposable
 
@@ -28,7 +29,14 @@ class Block : Image(texture) {
         }
     }
 
+    private val rect = Rectangle()
+
     init {
         setSize(80f, 80f)
+    }
+
+    fun getRectangle(): Rectangle {
+        rect.set(x, parent.y + y, width, height)
+        return rect
     }
 }

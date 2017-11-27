@@ -3,6 +3,7 @@ package cc.aoeiuv020.speed
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.utils.Disposable
@@ -31,6 +32,13 @@ class Hero : Image(texture) {
 
     init {
         setSize(20f, 20f)
+    }
+
+    private val rect = Rectangle()
+
+    fun getRectangle(): Rectangle {
+        rect.set(x, y, width, height)
+        return rect
     }
 
     override fun setStage(stage: Stage?) {

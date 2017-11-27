@@ -26,11 +26,12 @@ class GameScreen : ScreenAdapter() {
 
     init {
         gameStage.addActor(background)
-        gameStage.addActor(hero)
 
-        val barrier = Barrier()
+        val barrier = Barrier(this, hero)
         barrier.y = gameStage.height.let { it - it % 80 }
         gameStage.addActor(barrier)
+
+        gameStage.addActor(hero)
 
         Gdx.input.inputProcessor = controlStage
         controlStage.addListener(object : InputListener() {
@@ -45,9 +46,17 @@ class GameScreen : ScreenAdapter() {
             override fun touchDragged(event: InputEvent?, x: Float, y: Float, pointer: Int) {
                 deltaX = x - deltaX
                 deltaY = y - deltaY
-                hero.moveBy(movementMultiple * deltaX, movementMultiple * deltaY)
+                if (!pause) {
+                    hero.moveBy(movementMultiple * deltaX, movementMultiple * deltaY)
+                }
                 deltaX = x
                 deltaY = y
+            }
+
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
+                if (pause) {
+                    resume()
+                }
             }
         })
     }
@@ -56,11 +65,23 @@ class GameScreen : ScreenAdapter() {
         gameViewPort.update(width, height)
     }
 
+    private var pause = false
+
+    override fun pause() {
+        pause = true
+    }
+
+    override fun resume() {
+        pause = false
+    }
+
     override fun render(delta: Float) {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        gameStage.act(speedMultiple * delta)
+        if (!pause) {
+            gameStage.act(speedMultiple * delta)
+        }
         gameStage.draw()
     }
 
