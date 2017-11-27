@@ -8,6 +8,9 @@ import com.badlogic.gdx.scenes.scene2d.Group
  * Created by AoEiuV020 on 2017.11.27-19:16:15.
  */
 class Barrier : Group() {
+    companion object {
+        val ORIGINAL_SPEED = 400
+    }
 
     init {
         setSize(400f, 400f / 5)
@@ -25,10 +28,10 @@ class Barrier : Group() {
     override fun act(delta: Float) {
         super.act(delta)
 
-        y -= 400f * delta
+        y -= ORIGINAL_SPEED * delta
 
         if (y + height < 0f) {
-            y = stage.height
+            y += stage.height.let { it - it % 80 + 80 }
             reset()
         }
     }

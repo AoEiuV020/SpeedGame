@@ -29,7 +29,7 @@ class GameScreen : ScreenAdapter() {
         gameStage.addActor(hero)
 
         val barrier = Barrier()
-        barrier.y = gameStage.height
+        barrier.y = gameStage.height.let { it - it % 80 }
         gameStage.addActor(barrier)
 
         Gdx.input.inputProcessor = controlStage
