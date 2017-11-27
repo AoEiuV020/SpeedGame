@@ -30,7 +30,7 @@ class Hero : Image(texture) {
     }
 
     init {
-        setSize(40f, 40f)
+        setSize(20f, 20f)
     }
 
     override fun setStage(stage: Stage) {
