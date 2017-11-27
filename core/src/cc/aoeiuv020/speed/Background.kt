@@ -1,51 +1,39 @@
 package cc.aoeiuv020.speed
 
-import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Disposable
-import com.badlogic.gdx.utils.viewport.Viewport
 
 /**
  *
  * Created by AoEiuV020 on 2017.11.18-19:31:51.
  */
-class Background(viewport: Viewport) : Actor(), Disposable {
-    private val texture = Texture("background.jpg")
-    private val images: List<Image>
+class Background : Actor(), Disposable {
+    private lateinit var image: Image
+    private lateinit var texture: Texture
+    override fun setStage(stage: Stage) {
+        super.setStage(stage)
 
-    init {
-        val tmpImages = mutableListOf<Image>()
-        val width = viewport.screenWidth.toFloat()
-        val height = viewport.screenHeight.toFloat() / viewport.screenWidth * width
-        val x = 0f
-        var y = 0f
-        while (tmpImages.size * height < height + viewport.screenHeight) {
-            val image = Image(texture)
-            image.width = width
-            image.height = height
-            image.x = x
-            image.y = y
-            y += height
-            tmpImages.add(image)
+        setSize(stage.width, stage.height)
+
+        val p = Pixmap(width.toInt(), height.toInt(), Pixmap.Format.RGBA8888).apply {
+            setColor(Color.WHITE)
+            drawRectangle(0, 0, width, height)
         }
-        images = tmpImages
+        texture = Texture(p)
+        p.dispose()
+        image = Image(TextureRegionDrawable(TextureRegion(texture)))
     }
 
     override fun draw(batch: Batch?, parentAlpha: Float) {
-        images.forEach { image ->
-            image.draw(batch, parentAlpha)
-        }
-    }
-
-    fun update(camera: Camera) {
-        while (images[0].y + images[0].height < camera.position.y - camera.viewportHeight / 2) {
-            images.forEach { image ->
-                image.y += image.height
-            }
-        }
+        image.draw(batch, parentAlpha)
     }
 
     override fun dispose() {

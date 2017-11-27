@@ -3,24 +3,56 @@ package cc.aoeiuv020.speed
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.InputListener
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.StretchViewport
+import com.badlogic.gdx.utils.viewport.Viewport
 
 /**
  *
  * Created by AoEiuV020 on 2017.11.18-16:44:53.
  */
 class GameScreen : ScreenAdapter() {
-    companion object {
-        private val WIDTH = Gdx.graphics.width
-        private val HEIGHT = Gdx.graphics.height
-    }
-
-    private val gameStage: GameStage = GameStage()
+    private val controlViewPort: Viewport = StretchViewport(1080f, 720f)
+    private val gameViewPort: Viewport = FitViewport(480f, 800f)
+    private val background: Background = Background()
+    private val hero: Hero = Hero()
+    private val controlStage: Stage = Stage(controlViewPort)
+    private val gameStage: Stage = Stage(gameViewPort)
+    private var movementMultiple = 2f
 
     init {
+        gameStage.addActor(background)
+        gameStage.addActor(hero)
+
+        Gdx.input.inputProcessor = controlStage
+        controlStage.addListener(object : InputListener() {
+            private var deltaX = 0f
+            private var deltaY = 0f
+            override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                deltaX = x
+                deltaY = y
+                return true
+            }
+
+            override fun touchDragged(event: InputEvent?, x: Float, y: Float, pointer: Int) {
+                deltaX = x - deltaX
+                deltaY = y - deltaY
+                hero.moveBy(movementMultiple * deltaX, movementMultiple * deltaY)
+                deltaX = x
+                deltaY = y
+            }
+        })
+    }
+
+    override fun resize(width: Int, height: Int) {
+        gameViewPort.update(width, height)
     }
 
     override fun render(delta: Float) {
-        Gdx.gl.glClearColor(1f, 0f, 0f, 1f)
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         gameStage.act(delta)
@@ -28,6 +60,9 @@ class GameScreen : ScreenAdapter() {
     }
 
     override fun hide() {
+        controlStage.dispose()
         gameStage.dispose()
+        background.dispose()
+        Hero.dispose()
     }
 }
