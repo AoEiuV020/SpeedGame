@@ -33,9 +33,11 @@ class Hero : Image(texture) {
         setSize(20f, 20f)
     }
 
-    override fun setStage(stage: Stage) {
+    override fun setStage(stage: Stage?) {
         super.setStage(stage)
-        setCenter(stage.width / 2, height)
+        stage?.let {
+            setCenter(it.width / 2, height)
+        }
     }
 
     override fun positionChanged() {
