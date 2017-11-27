@@ -16,16 +16,18 @@ import com.badlogic.gdx.utils.viewport.Viewport
  */
 class GameScreen : ScreenAdapter() {
     private val controlViewPort: Viewport = StretchViewport(1080f, 720f)
-    private val gameViewPort: Viewport = FitViewport(480f, 800f)
+    private val gameViewPort: Viewport = FitViewport(400f, 720f)
     private val background: Background = Background()
     private val hero: Hero = Hero()
     private val controlStage: Stage = Stage(controlViewPort)
     private val gameStage: Stage = Stage(gameViewPort)
+    private val barrierPool = BarrierPool()
     private var movementMultiple = 2f
 
     init {
         gameStage.addActor(background)
         gameStage.addActor(hero)
+
 
         Gdx.input.inputProcessor = controlStage
         controlStage.addListener(object : InputListener() {
@@ -43,6 +45,12 @@ class GameScreen : ScreenAdapter() {
                 hero.moveBy(movementMultiple * deltaX, movementMultiple * deltaY)
                 deltaX = x
                 deltaY = y
+            }
+
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
+                val barrier = barrierPool.new()
+                barrier.y = gameStage.height
+                gameStage.addActor(barrier)
             }
         })
     }
@@ -64,5 +72,6 @@ class GameScreen : ScreenAdapter() {
         gameStage.dispose()
         background.dispose()
         Hero.dispose()
+        Block.dispose()
     }
 }
