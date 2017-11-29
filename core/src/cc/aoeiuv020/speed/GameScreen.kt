@@ -37,7 +37,7 @@ class GameScreen : ScreenAdapter() {
     private val hintStage: Stage = Stage(controlViewPort)
     private val settingStage: Stage = Stage(gameViewPort)
     private val gameStage: Stage = Stage(gameViewPort)
-    private var sensitivity = 1f
+    private var sensitivity = 2f
     private var maxSpeed = 10f
     private var speedMultiple = 1f
     private var gameRunning = false
