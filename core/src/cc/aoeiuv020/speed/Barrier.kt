@@ -35,24 +35,24 @@ class Barrier(private val screen: GameScreen, private val hero: Hero) : Group() 
     override fun act(delta: Float) {
         super.act(delta)
 
-        y -= ORIGINAL_SPEED * delta
-
-        if (y + height < 0f) {
+        val dY = ORIGINAL_SPEED * delta
+        move(dY)
+        while (y + height < 0f) {
             y += stage.height.let { it - it % 80 + 80 }
             shuffle()
         }
-        judge()
     }
 
-    private fun judge() {
-        if (hero.top.between(y, top)) {
-            val heroRect = hero.getRectangle()
+    private fun move(dY: Float) {
+        if (hero.top in y - dY..y) {
             children.forEach { block ->
-                val blockRect = (block as Block).getRectangle()
-                if (blockRect.overlaps(heroRect)) {
+                if (block.x < hero.right && hero.x < block.right) {
+                    y = hero.top
                     screen.gameOver()
+                    return
                 }
             }
         }
+        y -= dY
     }
 }

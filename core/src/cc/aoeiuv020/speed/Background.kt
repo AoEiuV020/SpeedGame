@@ -41,7 +41,7 @@ class Background : Actor(), Disposable {
 
     override fun act(delta: Float) {
         offset += Barrier.ORIGINAL_SPEED * delta
-        if (offset > blockHeight * 2) {
+        while (offset > blockHeight * 2) {
             offset -= blockHeight * 2
         }
         image.y = -offset
