@@ -34,6 +34,7 @@ class GameScreen : ScreenAdapter() {
     private val settings = SettingsButton()
     private val controlStage: Stage = Stage(controlViewPort)
     private val gameOverStage: Stage = Stage()
+    private val hintStage: Stage = Stage(controlViewPort)
     private val settingStage: Stage = Stage(gameViewPort)
     private val gameStage: Stage = Stage(gameViewPort)
     private var sensitivity = 1f
@@ -41,6 +42,7 @@ class GameScreen : ScreenAdapter() {
     private var speedMultiple = 1f
     private var gameRunning = false
     private var isSettingNow = false
+    private var isHintNow = false
     private lateinit var tfSensitivity: TextField
     private lateinit var tfMaxSpeed: TextField
     private val gameFont = BitmapFont().apply {
@@ -103,32 +105,32 @@ class GameScreen : ScreenAdapter() {
             })
         }
 
+        val ls = Label.LabelStyle().apply {
+            font = gameFont
+            fontColor = Color.WHITE
+        }
+        val tfs = TextField.TextFieldStyle().apply {
+            font = gameFont
+            fontColor = Color.WHITE
+            val p = Pixmap(1, 1, Pixmap.Format.RGB888).apply {
+                setColor(Color.DARK_GRAY)
+                fill()
+            }
+            // 三个Texture没有销毁，
+            background = TextureRegionDrawable(TextureRegion(Texture(p)))
+            p.apply {
+                setColor(Color.GREEN)
+                fill()
+            }
+            selection = TextureRegionDrawable(TextureRegion(Texture(p)))
+            p.apply {
+                setColor(Color.WHITE)
+                fill()
+            }
+            cursor = TextureRegionDrawable(TextureRegion(Texture(p)))
+            p.dispose()
+        }
         settingStage.apply {
-            val ls = Label.LabelStyle().apply {
-                font = gameFont
-                fontColor = Color.WHITE
-            }
-            val tfs = TextField.TextFieldStyle().apply {
-                font = gameFont
-                fontColor = Color.WHITE
-                val p = Pixmap(1, 1, Pixmap.Format.RGB888).apply {
-                    setColor(Color.DARK_GRAY)
-                    fill()
-                }
-                // 三个Texture没有销毁，
-                background = TextureRegionDrawable(TextureRegion(Texture(p)))
-                p.apply {
-                    setColor(Color.GREEN)
-                    fill()
-                }
-                selection = TextureRegionDrawable(TextureRegion(Texture(p)))
-                p.apply {
-                    setColor(Color.WHITE)
-                    fill()
-                }
-                cursor = TextureRegionDrawable(TextureRegion(Texture(p)))
-                p.dispose()
-            }
             var y = settingStage.height / 10 * 8
             addActor(Label("Sensitivity", ls).apply {
                 setPosition(80f, y)
@@ -139,7 +141,7 @@ class GameScreen : ScreenAdapter() {
                 y -= height + 10f
             }
             addActor(tfSensitivity)
-            addActor(Label("MaxSpeed", ls).apply {
+            addActor(Label("Max Speed", ls).apply {
                 setPosition(80f, y)
                 y -= height + 10f
             })
@@ -150,8 +152,25 @@ class GameScreen : ScreenAdapter() {
             addActor(tfMaxSpeed)
         }
 
+        hintStage.apply {
+            addActor(Label("Move", ls).apply {
+                setPosition(100f, 100f)
+            })
+            addActor(Label("Change Speed", ls).apply {
+                setPosition(hintStage.height, hintStage.height / 2)
+            })
+            addListener(object : ClickListener() {
+                override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                    isHintNow = false
+                    gameViewPort.update(screen.first, screen.second)
+                    gameOver()
+                }
+            })
+        }
+
         barrier.reset()
-        gameOver()
+
+        hint()
     }
 
     private fun setSpeed(speed: Float) {
@@ -180,8 +199,15 @@ class GameScreen : ScreenAdapter() {
         } ?: hero.moveBy(dX, 0f)
     }
 
+    private lateinit var screen: Pair<Int, Int>
+
     override fun resize(width: Int, height: Int) {
-        gameViewPort.update(width, height)
+        screen = Pair(width, height)
+        if (isHintNow) {
+            controlViewPort.update(width, height)
+        } else {
+            gameViewPort.update(width, height)
+        }
     }
 
     private var pause = false
@@ -198,6 +224,10 @@ class GameScreen : ScreenAdapter() {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
+        if (isHintNow) {
+            hintStage.draw()
+            return
+        }
         if (gameRunning && !pause) {
             gameStage.act(speedMultiple * delta)
         }
@@ -252,5 +282,10 @@ class GameScreen : ScreenAdapter() {
         gameStage.root.removeActor(start)
         settingStage.addActor(start)
         isSettingNow = true
+    }
+
+    private fun hint() {
+        Gdx.input.inputProcessor = hintStage
+        isHintNow = true
     }
 }
