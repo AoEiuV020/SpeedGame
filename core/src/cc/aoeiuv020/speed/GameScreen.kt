@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.StretchViewport
 import com.badlogic.gdx.utils.viewport.Viewport
@@ -22,19 +23,19 @@ class GameScreen : ScreenAdapter() {
     private val hero: Hero = Hero()
     private val barrier: Barrier = Barrier(this, hero)
     private val controlStage: Stage = Stage(controlViewPort)
+    private val gameOverStage: Stage = Stage()
     private val gameStage: Stage = Stage(gameViewPort)
     private var movementMultiple = 2f
     private var speedMultiple = 2f
+    private var gameRunning = false
 
     init {
         gameStage.addActor(background)
 
-        barrier.y = gameStage.height.let { it - it % 80 }
         gameStage.addActor(barrier)
 
         gameStage.addActor(hero)
 
-        Gdx.input.inputProcessor = controlStage
         controlStage.addListener(object : InputListener() {
             private var deltaX = 0f
             private var deltaY = 0f
@@ -54,12 +55,6 @@ class GameScreen : ScreenAdapter() {
                 deltaY = y
             }
 
-            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
-                if (pause) {
-                    resume()
-                }
-            }
-
             override fun keyDown(event: InputEvent, keycode: Int): Boolean {
                 if ((Input.Keys.NUM_1..Input.Keys.NUM_9).contains(keycode)) {
                     val num = keycode - Input.Keys.NUM_0
@@ -68,6 +63,13 @@ class GameScreen : ScreenAdapter() {
                 return false
             }
         })
+        gameOverStage.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                gameStart()
+            }
+        })
+        barrier.reset()
+        gameOver()
     }
 
     private fun move(dX: Float) {
@@ -110,10 +112,11 @@ class GameScreen : ScreenAdapter() {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        if (!pause) {
+        if (gameRunning) {
             gameStage.act(speedMultiple * delta)
         }
         gameStage.draw()
+        gameOverStage.draw()
     }
 
     override fun hide() {
@@ -122,5 +125,16 @@ class GameScreen : ScreenAdapter() {
         background.dispose()
         Hero.dispose()
         Block.dispose()
+    }
+
+    fun gameStart() {
+        Gdx.input.inputProcessor = controlStage
+        barrier.reset()
+        gameRunning = true
+    }
+
+    fun gameOver() {
+        Gdx.input.inputProcessor = gameOverStage
+        gameRunning = false
     }
 }

@@ -1,6 +1,5 @@
 package cc.aoeiuv020.speed
 
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.Group
 
@@ -8,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Group
  *
  * Created by AoEiuV020 on 2017.11.27-19:16:15.
  */
-class Barrier(private val screen: Screen, private val hero: Hero) : Group() {
+class Barrier(private val screen: GameScreen, private val hero: Hero) : Group() {
     companion object {
         val ORIGINAL_SPEED = 400
     }
@@ -20,7 +19,14 @@ class Barrier(private val screen: Screen, private val hero: Hero) : Group() {
         addActor(Block())
     }
 
-    private fun reset() {
+    fun reset() {
+        if (y < height) {
+            y += ((stage.height - (y + height)) / 80).toInt() * 80f
+            shuffle()
+        }
+    }
+
+    private fun shuffle() {
         children.forEach { block ->
             block.x = block.width * MathUtils.random(0, 4)
         }
@@ -33,7 +39,7 @@ class Barrier(private val screen: Screen, private val hero: Hero) : Group() {
 
         if (y + height < 0f) {
             y += stage.height.let { it - it % 80 + 80 }
-            reset()
+            shuffle()
         }
         judge()
     }
@@ -44,7 +50,7 @@ class Barrier(private val screen: Screen, private val hero: Hero) : Group() {
             children.forEach { block ->
                 val blockRect = (block as Block).getRectangle()
                 if (blockRect.overlaps(heroRect)) {
-                    screen.pause()
+                    screen.gameOver()
                 }
             }
         }
