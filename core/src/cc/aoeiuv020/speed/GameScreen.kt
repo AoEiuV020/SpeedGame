@@ -22,6 +22,7 @@ class GameScreen : ScreenAdapter() {
     private val background: Background = Background()
     private val hero: Hero = Hero()
     private val barrier: Barrier = Barrier(this, hero)
+    private val start = StartButton()
     private val controlStage: Stage = Stage(controlViewPort)
     private val gameOverStage: Stage = Stage()
     private val gameStage: Stage = Stage(gameViewPort)
@@ -30,6 +31,9 @@ class GameScreen : ScreenAdapter() {
     private var gameRunning = false
 
     init {
+
+        start.setCenter(gameStage.width / 2, gameStage.height / 3)
+
         gameStage.addActor(background)
 
         gameStage.addActor(barrier)
@@ -125,16 +129,19 @@ class GameScreen : ScreenAdapter() {
         background.dispose()
         Hero.dispose()
         Block.dispose()
+        StartButton.dispose()
     }
 
     fun gameStart() {
         Gdx.input.inputProcessor = controlStage
+        gameStage.root.removeActor(start)
         barrier.reset()
         gameRunning = true
     }
 
     fun gameOver() {
         Gdx.input.inputProcessor = gameOverStage
+        gameStage.addActor(start)
         gameRunning = false
     }
 }
