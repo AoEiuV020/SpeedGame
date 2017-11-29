@@ -45,17 +45,15 @@ class GameScreen : ScreenAdapter() {
     private var isHintNow = false
     private lateinit var tfSensitivity: TextField
     private lateinit var tfMaxSpeed: TextField
+    private lateinit var lDistance: Label
+    private lateinit var lScore: Label
+    private var distance: Double = 0.0
+    private var score: Double = 0.0
     private val gameFont = BitmapFont().apply {
         data.setScale(2f)
     }
 
     init {
-
-        gameStage.addActor(background)
-
-        gameStage.addActor(barrier)
-
-        gameStage.addActor(hero)
 
         controlStage.addListener(object : InputListener() {
             private val map: MutableMap<Int, Pair<Vector2, Boolean>> = mutableMapOf()
@@ -168,6 +166,23 @@ class GameScreen : ScreenAdapter() {
             })
         }
 
+        gameStage.apply {
+            addActor(background)
+            addActor(barrier)
+            addActor(hero)
+            var y = settingStage.height / 10 * 9
+            lDistance = Label("0", ls).apply {
+                setPosition(10f, y)
+                y -= height + 10f
+            }
+            lScore = Label("0", ls).apply {
+                setPosition(10f, y)
+                y -= height + 10f
+            }
+            addActor(lDistance)
+            addActor(lScore)
+        }
+
         barrier.reset()
 
         hint()
@@ -229,7 +244,12 @@ class GameScreen : ScreenAdapter() {
             return
         }
         if (gameRunning && !pause) {
-            gameStage.act(speedMultiple * delta)
+            val d = speedMultiple * delta
+            gameStage.act(d)
+            distance += d
+            score += d * speedMultiple
+            lDistance.setText(String.format("%.2f", distance))
+            lScore.setText(String.format("%.2f", score))
         }
         gameStage.draw()
         gameOverStage.draw()
@@ -265,6 +285,8 @@ class GameScreen : ScreenAdapter() {
         }
         gameStage.root.removeActor(settings)
         setSpeed(1f)
+        distance = 0.0
+        score = 0.0
         barrier.reset()
         gameRunning = true
         isSettingNow = false
