@@ -20,6 +20,7 @@ class GameScreen : ScreenAdapter() {
     private val gameViewPort: Viewport = FitViewport(400f, 720f)
     private val background: Background = Background()
     private val hero: Hero = Hero()
+    private val barrier: Barrier = Barrier(this, hero)
     private val controlStage: Stage = Stage(controlViewPort)
     private val gameStage: Stage = Stage(gameViewPort)
     private var movementMultiple = 2f
@@ -28,7 +29,6 @@ class GameScreen : ScreenAdapter() {
     init {
         gameStage.addActor(background)
 
-        val barrier = Barrier(this, hero)
         barrier.y = gameStage.height.let { it - it % 80 }
         gameStage.addActor(barrier)
 
@@ -48,7 +48,7 @@ class GameScreen : ScreenAdapter() {
                 deltaX = x - deltaX
                 deltaY = y - deltaY
                 if (!pause) {
-                    hero.moveBy(movementMultiple * deltaX, 0f)
+                    move(movementMultiple * deltaX)
                 }
                 deltaX = x
                 deltaY = y
@@ -68,6 +68,28 @@ class GameScreen : ScreenAdapter() {
                 return false
             }
         })
+    }
+
+    private fun move(dX: Float) {
+        if (hero.top < barrier.y || hero.y > barrier.top) {
+            hero.moveBy(dX, 0f)
+            return
+        }
+        barrier.children.mapNotNull { block ->
+            if (dX > 0) {
+                block.x.takeIf { it >= hero.right && it <= hero.right + dX }
+            } else {
+                block.right.takeIf { it <= hero.x && it >= hero.x + dX }
+            }
+        }.minBy {
+            Math.abs(it - hero.x)
+        }?.let {
+            if (dX > 0) {
+                hero.moveBy(it - hero.right, 0f)
+            } else {
+                hero.moveBy(it - hero.x, 0f)
+            }
+        } ?: hero.moveBy(dX, 0f)
     }
 
     override fun resize(width: Int, height: Int) {
