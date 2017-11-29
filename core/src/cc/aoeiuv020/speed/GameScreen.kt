@@ -48,7 +48,7 @@ class GameScreen : ScreenAdapter() {
                 deltaX = x - deltaX
                 deltaY = y - deltaY
                 if (!pause) {
-                    hero.moveBy(movementMultiple * deltaX, movementMultiple * deltaY)
+                    hero.moveBy(movementMultiple * deltaX, 0f)
                 }
                 deltaX = x
                 deltaY = y

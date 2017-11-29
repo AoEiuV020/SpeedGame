@@ -44,11 +44,7 @@ class Barrier(private val screen: Screen, private val hero: Hero) : Group() {
             children.forEach { block ->
                 val blockRect = (block as Block).getRectangle()
                 if (blockRect.overlaps(heroRect)) {
-                    hero.y = y - hero.height
-                    heroRect.y = y - hero.height
-                    if (hero.top.between(y, top)) {
-                        screen.pause()
-                    }
+                    screen.pause()
                 }
             }
         }
