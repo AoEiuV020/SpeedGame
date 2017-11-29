@@ -1,9 +1,9 @@
 package cc.aoeiuv020.speed
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.InputListener
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -26,8 +26,8 @@ class GameScreen : ScreenAdapter() {
     private val controlStage: Stage = Stage(controlViewPort)
     private val gameOverStage: Stage = Stage()
     private val gameStage: Stage = Stage(gameViewPort)
-    private var movementMultiple = 2f
-    private var speedMultiple = 2f
+    private var movementMultiple = 1f
+    private var speedMultiple = 1f
     private var gameRunning = false
 
     init {
@@ -41,39 +41,47 @@ class GameScreen : ScreenAdapter() {
         gameStage.addActor(hero)
 
         controlStage.addListener(object : InputListener() {
-            private var deltaX = 0f
-            private var deltaY = 0f
+            private val map: MutableMap<Int, Pair<Vector2, Boolean>> = mutableMapOf()
             override fun touchDown(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                deltaX = x
-                deltaY = y
+                val isSpeed = x > controlStage.width / 3 * 2
+                map.put(pointer, Vector2(x, y) to isSpeed)
+                if (isSpeed) {
+                    setSpeed(y / controlStage.height * 10)
+                }
                 return true
             }
 
             override fun touchDragged(event: InputEvent?, x: Float, y: Float, pointer: Int) {
-                deltaX = x - deltaX
-                deltaY = y - deltaY
-                if (!pause) {
-                    move(movementMultiple * deltaX)
+                val p = map[pointer]!!
+                val v = p.first
+                v.set(x - v.x, y - v.y)
+                if (p.second) {
+                    setSpeed(y / controlStage.height * 10)
+                } else {
+                    move(movementMultiple * v.x)
                 }
-                deltaX = x
-                deltaY = y
+                v.set(x, y)
             }
 
-            override fun keyDown(event: InputEvent, keycode: Int): Boolean {
-                if ((Input.Keys.NUM_1..Input.Keys.NUM_9).contains(keycode)) {
-                    val num = keycode - Input.Keys.NUM_0
-                    speedMultiple = num.toFloat()
+            override fun touchUp(event: InputEvent?, x: Float, y: Float, pointer: Int, button: Int) {
+                val p = map[pointer]!!
+                if (p.second) {
+                    setSpeed(1f)
                 }
-                return false
             }
         })
-        gameOverStage.addListener(object : ClickListener() {
-            override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                gameStart()
-            }
-        })
+        gameOverStage.addListener(
+                object : ClickListener() {
+                    override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                        gameStart()
+                    }
+                })
         barrier.reset()
         gameOver()
+    }
+
+    private fun setSpeed(speed: Float) {
+        speedMultiple = speed
     }
 
     private fun move(dX: Float) {
@@ -102,7 +110,8 @@ class GameScreen : ScreenAdapter() {
         gameViewPort.update(width, height)
     }
 
-    private var pause = false
+    private
+    var pause = false
 
     override fun pause() {
         pause = true
@@ -135,6 +144,7 @@ class GameScreen : ScreenAdapter() {
     fun gameStart() {
         Gdx.input.inputProcessor = controlStage
         gameStage.root.removeActor(start)
+        setSpeed(1f)
         barrier.reset()
         gameRunning = true
     }
