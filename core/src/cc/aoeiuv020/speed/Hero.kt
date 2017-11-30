@@ -19,7 +19,7 @@ class Hero : Image(), Disposable {
 
     init {
         val p = Pixmap(111, 111, Pixmap.Format.RGBA8888).apply {
-            setColor(Color.WHITE)
+            setColor(Color.YELLOW)
             fillCircle(width / 2, height / 2, minOf(width, height) / 2)
         }
         texture = Texture(p)
