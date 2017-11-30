@@ -1,2 +1,2 @@
-# SupersonicSpeedCar
-安卓快节奏简单的超音速躲避车休闲游戏，
+# SpeedGame
+安卓快节奏简单的超高速躲避方块休闲游戏，
