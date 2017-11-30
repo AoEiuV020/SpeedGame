@@ -2,21 +2,29 @@ package cc.aoeiuv020.speed
 
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.Group
+import com.badlogic.gdx.utils.Disposable
 
 /**
  *
  * Created by AoEiuV020 on 2017.11.27-19:16:15.
  */
-class Barrier(private val screen: GameScreen, private val hero: Hero) : Group() {
+class Barrier(private val screen: GameScreen, private val hero: Hero) : Group(), Disposable {
     companion object {
         val ORIGINAL_SPEED = 400
     }
 
+    private val blockList = mutableListOf<Block>()
+
     init {
         setSize(400f, 400f / 5)
-        addActor(Block())
-        addActor(Block())
-        addActor(Block())
+        add(Block())
+        add(Block())
+        add(Block())
+    }
+
+    private fun add(block: Block) {
+        blockList.add(block)
+        addActor(block)
     }
 
     fun reset() {
@@ -54,5 +62,11 @@ class Barrier(private val screen: GameScreen, private val hero: Hero) : Group() 
             }
         }
         y -= dY
+    }
+
+    override fun dispose() {
+        blockList.forEach {
+            it.dispose()
+        }
     }
 }

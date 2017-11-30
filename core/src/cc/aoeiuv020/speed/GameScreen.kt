@@ -27,16 +27,16 @@ import com.badlogic.gdx.utils.viewport.Viewport
 class GameScreen : ScreenAdapter() {
     private val controlViewPort: Viewport = StretchViewport(1080f, 720f)
     private val gameViewPort: Viewport = FitViewport(400f, 720f)
-    private val background: Background = Background()
-    private val hero: Hero = Hero()
-    private val barrier: Barrier = Barrier(this, hero)
-    private val start = StartButton()
-    private val settings = SettingsButton()
-    private val controlStage: Stage = Stage(controlViewPort)
-    private val gameOverStage: Stage = Stage()
-    private val hintStage: Stage = Stage(controlViewPort)
-    private val settingStage: Stage = Stage(gameViewPort)
-    private val gameStage: Stage = Stage(gameViewPort)
+    private lateinit var background: Background
+    private lateinit var hero: Hero
+    private lateinit var barrier: Barrier
+    private lateinit var start: StartButton
+    private lateinit var settings: SettingsButton
+    private lateinit var controlStage: Stage
+    private lateinit var gameOverStage: Stage
+    private lateinit var hintStage: Stage
+    private lateinit var settingStage: Stage
+    private lateinit var gameStage: Stage
     private var sensitivity = 2f
     private var maxSpeed = 10f
     private var speedMultiple = 1f
@@ -53,7 +53,17 @@ class GameScreen : ScreenAdapter() {
         data.setScale(2f)
     }
 
-    init {
+    override fun show() {
+        background = Background()
+        hero = Hero()
+        barrier = Barrier(this, hero)
+        start = StartButton()
+        settings = SettingsButton()
+        controlStage = Stage(controlViewPort)
+        gameOverStage = Stage()
+        hintStage = Stage(controlViewPort)
+        settingStage = Stage(gameViewPort)
+        gameStage = Stage(gameViewPort)
 
         controlStage.addListener(object : InputListener() {
             private val map: MutableMap<Int, Pair<Vector2, Boolean>> = mutableMapOf()
@@ -263,9 +273,10 @@ class GameScreen : ScreenAdapter() {
         controlStage.dispose()
         gameStage.dispose()
         background.dispose()
-        Hero.dispose()
-        Block.dispose()
-        StartButton.dispose()
+        hero.dispose()
+        barrier.dispose()
+        start.dispose()
+        settings.dispose()
     }
 
     fun gameStart() {
